@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Classifications{% endblock %}
+
+{% block header %}
+<h1>Exercise 4: Classifications</h1>
+{% endblock %} 
+
+{% block content %}
+<li>
+    {% for classification in classifications%}
+    <ul><a href= "{% url 'classification' classification.pk %}">{{classification.name}}</a></ul>
+    {% empty %}
+    <ul>No classifications</ul>
+    {% endfor %}
+</li> 
+{% endblock %}

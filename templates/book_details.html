@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Book Details{% endblock %}
+
+{% block header %}
+<h1>Exercise 4: Book Details</h1>
+{% endblock %} 
+
+{% block content %} 
+<h3>Title: {{book.title}}</h3>
+<p>Author: <a href = "{% url 'author-info' book.author.pk %}">{{book.author}}</a></p>
+<p>Classification: {{book.classification}}</p>  
+{% endblock %}

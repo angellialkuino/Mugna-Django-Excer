@@ -22,6 +22,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("math/<int:num1>/<int:num2>", views.mathed2),
     path("math/<int:num1>/<int:num2>/<int:num3>", views.mathed3),
-    path("valid-date/<int:year>/<int:month>/<int:day>", views.date_format)
+    path("valid-date/<int:year>/<int:month>/<int:day>", views.date_format),
+
+    path("books/", views.book_list),
+    path("books/<int:book_id>", views.book_details, name="book-details"),
+    path("author/<int:author_id>", views.author_info, name="author-info"),
+    path("classification/", views.classification_list),
+    path("classification/<int:classification_id>", views.classification_books, name="classification"),
+
 ]
 

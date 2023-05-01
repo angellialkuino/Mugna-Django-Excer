@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Author Information{% endblock %}
+
+{% block header %}
+<h1>Exercise 4: Author Information</h1>
+{% endblock %} 
+
+{% block content %} 
+<h3>Name: {{author.full_name}}</h3>
+
+<li>
+    {% for book in books%}
+    <ul><a href= "{% url 'book-details' book.pk %}">{{book.title}}</a></ul>
+    {% empty %}
+    <ul>No books</ul>
+    {% endfor %}
+</li> 
+{% endblock %}

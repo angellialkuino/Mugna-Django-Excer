@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from datetime import datetime
 from django.shortcuts import render
+from exercises.models import Book, Author, Classification
+
 
 # Create your views here.
 
@@ -53,4 +55,45 @@ def date_format(request, year, month, day):
         request,
         "date_format.html",
         {"status": "Valid"}
+    )
+
+def book_list(request):
+    books = Book.objects.all()
+    return render(
+        request,
+        "book.html",
+        {"book_list": books}
+    )
+
+def book_details(request, book_id):
+    book = Book.objects.get(id = int(book_id))
+    return render(
+        request,
+        'book_details.html',
+        {"book": book}
+    )
+
+def author_info(request, author_id):
+    author = Author.objects.get(id = int(author_id))
+    books = Book.objects.filter(author_id = int(author_id))
+    return render(
+        request,
+        'author_info.html',
+        {"author": author, "books": books}
+    )
+
+def classification_list(request):
+    classifications = Classification.objects.all()
+    return render(
+        request,
+        'classification_list.html',
+        {"classifications": classifications}
+    )
+
+def classification_books(request, classification_id):
+    books = Book.objects.filter(classification_id = int(classification_id))
+    return render(
+        request,
+        'classification_books.html',
+        {"books": books}
     )
