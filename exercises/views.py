@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from datetime import datetime
+from django.shortcuts import render
 
 # Create your views here.
 
@@ -14,7 +15,11 @@ def mathed2(request, num1, num2):
     except ValueError:
         raise Http404()
 
-    return HttpResponse(f"Sum: {num1+num2} Difference: {num1-num2} Product: {num1*num2} Quotient: {num1/num2}")
+    return render(
+        request,
+        "math.html",
+        {"sum": num1+num2, "diff": num1-num2, "prod": num1*num2, "quo": num1/num2}
+    )
 
 def mathed3(request, num1, num2, num3):
     try:
@@ -25,8 +30,11 @@ def mathed3(request, num1, num2, num3):
             raise Http404()
     except ValueError:
         raise Http404()
-
-    return HttpResponse(f"Sum: {num1+num2+num3} Difference: {num1-num2-num3} Product: {num1*num2*num3} Quotient: {(num1/num2)/num3}")
+    return render(
+        request,
+        "math.html",
+        {"sum": num1+num2+num3, "diff": num1-num2-num3, "prod": num1*num2*num3, "quo": (num1/num2)/num3}
+    )
 
 def date_format(request, year, month, day):
     try:
@@ -35,6 +43,14 @@ def date_format(request, year, month, day):
         day = int(day)
         datetime(year,month,day)        
     except ValueError:
-        return HttpResponse("Invalid date")
+        return render(
+        request,
+        "date_format.html",
+        {"status": "Invalid"}
+        )
 
-    return HttpResponse("Valid date")
+    return render(
+        request,
+        "date_format.html",
+        {"status": "Valid"}
+    )
