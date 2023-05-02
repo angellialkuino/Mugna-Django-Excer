@@ -11,15 +11,27 @@ class Classification(models.Model):
         return self.name
 
 class Author(models.Model):
-    full_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField(verbose_name="e-mail")
 
     def __str__(self):
-        return self.full_name
+        return self.first_name
+
+class Publisher(models.Model):
+    name = models.CharField(max_length=50)
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    website = models.URLField()
+
+    def __str__(self):
+        return self.name
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey("exercises.Author", on_delete=models.CASCADE, related_name="exercises")
     classification = models.ForeignKey("exercises.Classification", on_delete=models.CASCADE, related_name="exercises")
+    publisher = models.ForeignKey("exercises.Publisher", on_delete=models.CASCADE, related_name="exercises")
 
     def __str__(self):
         return self.title
