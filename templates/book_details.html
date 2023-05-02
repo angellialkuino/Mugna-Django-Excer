@@ -10,4 +10,5 @@
 <h3>Title: {{book.title}}</h3>
 <p>Author: <a href = "{% url 'author-info' book.author.pk %}">{{book.author}}</a></p>
 <p>Classification: {{book.classification}}</p>  
+<p><a href="{% url 'update-book' book.id%}">Update Book</a></p>
 {% endblock %}
