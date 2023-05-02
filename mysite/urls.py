@@ -30,5 +30,17 @@ urlpatterns = [
     path("classification/", views.classification_list),
     path("classification/<int:classification_id>", views.classification_books, name="classification"),
 
+    path("search-author/", views.search_author),
+    path("search-publisher/", views.search_publisher),
+
+    path("create-publisher/", views.create_publisher),
+    path("create-book/", views.create_book),
+
+    path("update-publisher/<int:pk>/", views.update_publisher),
+    path("update-book/<int:pk>/", views.update_book),
+
+    path("delete-publisher/<int:pk>/", views.delete_publisher),
+    path("delete-book/<int:pk>/", views.delete_book),
+
 ]
 

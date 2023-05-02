@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block header %}
+<h1>Exercise 6: CRUD Results</h1>
+{% endblock %} 
+
+{% block content %} 
+<li>
+    {% for a in results%}
+    <ul>{{ a }}</a></ul>
+    {% empty %}
+    <ul>No Results</ul>
+    {% endfor %}
+</li> 
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from datetime import datetime
-from django.shortcuts import render
-from exercises.models import Book, Author, Classification
+from django.shortcuts import get_object_or_404, render
+from exercises.models import Book, Author, Classification, Publisher
+from exercises.forms import PublisherForm, BookForm
 
 
 # Create your views here.
@@ -97,3 +98,89 @@ def classification_books(request, classification_id):
         'classification_books.html',
         {"books": books}
     )
+
+
+def search_author(request):
+    error = False
+    if "query" in request.GET:
+        query = request.GET["query"]
+        if not query:
+            error = True
+        else:
+            author = Author.objects.filter(first_name__icontains=query)
+            return render(
+                request,
+                "search_results.html",
+                {"results": author, "query": query},
+            )
+    return render(request, "search_form.html", {"error": error})
+
+def search_publisher(request):
+    error = False
+    if "query" in request.GET:
+        query = request.GET["query"]
+        if not query:
+            error = True
+        else:
+            publisher = Publisher.objects.filter(name__icontains=query)
+            return render(
+                request,
+                "search_results.html",
+                {"results": publisher, "query": query},
+            )
+    return render(request, "search_form.html", {"error": error})
+
+
+def create_publisher(request):
+    form = PublisherForm()
+    if request.method == "POST":
+        form = PublisherForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+    return render(request, "create_obj.html", {"form": form, "obj": "Publisher"})
+
+def create_book(request):
+    form = BookForm()
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Book.objects.all()})
+    return render(request, "create_obj.html", {"form": form, "obj": "Book"})
+    
+    
+def update_publisher(request, pk=None):
+    publisher = get_object_or_404(Publisher, pk=pk)
+    form = PublisherForm(instance=publisher)
+    if request.method == "POST":
+        form = PublisherForm(request.POST, instance=publisher)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+    return render(request, "update_obj.html", {"form": form, "obj": "Publisher"})
+
+def update_book(request, pk=None):
+    book = get_object_or_404(Book, pk=pk)
+    form = BookForm(instance=book)
+    if request.method == "POST":
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Book.objects.all()})
+    return render(request, "update_obj.html", {"form": form, "obj": "Book"})
+
+
+def delete_publisher(request, pk=None):
+    publisher = get_object_or_404(Publisher, pk=pk)
+    if request.method == "POST":
+        publisher.delete()
+        return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+    return render(request, "delete_obj.html", {"obj": "Publisher"})
+
+def delete_book(request, pk=None):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == "POST":
+        book.delete()
+        return render(request, "crud_results.html", {"results": Book.objects.all()})
+    return render(request, "delete_obj.html", {"obj": "Book"})
