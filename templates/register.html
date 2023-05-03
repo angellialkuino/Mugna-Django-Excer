@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}List of All Books{% endblock %}
+
+{% block header %}
+<h1>Exercise 7: Registration Form</h1>
+{% endblock %} 
+
+{% block content %} 
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Register">
+</form>
+{% endblock %}

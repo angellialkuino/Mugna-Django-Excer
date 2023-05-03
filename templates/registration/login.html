@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}List of All Books{% endblock %}
+
+{% block header %}
+<h1>Exercise 7: Login Page</h1>
+{% endblock %} 
+
+{% block content %} 
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Login">
+</form>
+{% if error == "invalid login" %}
+    <p style="color: red;">Invalid Login</p>
+{% endif %}
+
+{% if error == "disabled account" %}
+    <p style="color: red;">Disabled Account Error</p>
+{% endif %}
+{% endblock %}

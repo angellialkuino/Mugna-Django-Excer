@@ -3,7 +3,11 @@ from django.http import HttpResponse, Http404
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
 from exercises.models import Book, Author, Classification, Publisher
-from exercises.forms import PublisherForm, BookForm
+from exercises.forms import PublisherForm, BookForm, RegistrationForm, LoginForm
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.conf import settings
 
 
 # Create your views here.
@@ -58,7 +62,9 @@ def date_format(request, year, month, day):
         {"status": "Valid"}
     )
 
-def book_list(request):
+
+@login_required
+def book_list(request):    
     books = Book.objects.all()
     return render(
         request,
@@ -66,6 +72,7 @@ def book_list(request):
         {"book_list": books}
     )
 
+@login_required
 def book_details(request, book_id):
     book = Book.objects.get(id = int(book_id))
     return render(
@@ -74,6 +81,7 @@ def book_details(request, book_id):
         {"book": book}
     )
 
+@login_required
 def author_info(request, author_id):
     author = Author.objects.get(id = int(author_id))
     books = Book.objects.filter(author_id = int(author_id))
@@ -83,6 +91,7 @@ def author_info(request, author_id):
         {"author": author, "books": books}
     )
 
+@login_required
 def classification_list(request):
     classifications = Classification.objects.all()
     return render(
@@ -91,6 +100,7 @@ def classification_list(request):
         {"classifications": classifications}
     )
 
+@login_required
 def classification_books(request, classification_id):
     books = Book.objects.filter(classification_id = int(classification_id))
     return render(
@@ -131,6 +141,10 @@ def search_publisher(request):
     return render(request, "search_form.html", {"error": error})
 
 
+def is_admin(user):
+    return user.is_superuser
+
+@user_passes_test(is_admin)
 def create_publisher(request):
     form = PublisherForm()
     if request.method == "POST":
@@ -140,6 +154,7 @@ def create_publisher(request):
             return render(request, "crud_results.html", {"results": Publisher.objects.all()})
     return render(request, "create_obj.html", {"form": form, "obj": "Publisher"})
 
+@user_passes_test(is_admin)
 def create_book(request):
     form = BookForm()
     if request.method == "POST":
@@ -184,3 +199,49 @@ def delete_book(request, pk=None):
         book.delete()
         return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "delete_obj.html", {"obj": "Book"})
+
+
+
+def register(request):
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+            user = User.objects.create_user(username,email,password)
+
+            return render(request, "home.html")
+    else:
+        form = RegistrationForm() #unbound form wtf is that
+    
+    return render(request, "register.html", {"form": form})
+
+# def login_view(request):
+#     if request.method == "POST":
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data["username"]
+#             password = form.cleaned_data["password"]
+#             user = authenticate(username=username,password=password)
+#             if user is not None:
+#                 if user.is_active:
+#                     login(request, user)
+#                     return render(request, "book.html")
+#                 else:
+#                     return render(request, "login.html", {"form": form, "error": "disabled account"})
+#             else:
+#                 return render(request, "login.html", {"form": form, "error": "invalid login"})
+#     else:
+#         form = LoginForm() 
+#     return render(request, "login.html", {"form": form})
+
+# def logout_view(request):    
+#     if "query" in request.GET:
+#         logout(request)
+#         form = LoginForm()
+#         return render(request, "login.html", {"form": form})
+#     return render(request, "logout.html")
+
+
+

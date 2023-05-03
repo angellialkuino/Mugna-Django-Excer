@@ -17,14 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from exercises import views
+from django.urls import path, include
+from django.views.generic.base import TemplateView #para sa unsa mn ni
 
 urlpatterns = [
+    path("accounts/", include("django.contrib.auth.urls")),
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+
     path('admin/', admin.site.urls),
     path("math/<int:num1>/<int:num2>", views.mathed2),
     path("math/<int:num1>/<int:num2>/<int:num3>", views.mathed3),
     path("valid-date/<int:year>/<int:month>/<int:day>", views.date_format),
 
-    path("books/", views.book_list),
+    path("books/", views.book_list, name="book-list"),
     path("books/<int:book_id>", views.book_details, name="book-details"),
     path("author/<int:author_id>", views.author_info, name="author-info"),
     path("classification/", views.classification_list),
@@ -41,6 +46,12 @@ urlpatterns = [
 
     path("delete-publisher/<int:pk>/", views.delete_publisher),
     path("delete-book/<int:pk>/", views.delete_book),
+
+
+    # path("register/", views.register),
+    # path("login/", views.login_view),
+    # path("logout/", views.logout_view),
+
 
 ]
 
