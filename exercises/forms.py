@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from exercises.models import Book, Publisher
+from exercises.models import Book, Publisher, Author
 
 class PublisherForm(ModelForm):
     class Meta:
@@ -10,6 +10,11 @@ class PublisherForm(ModelForm):
 class BookForm(ModelForm):
     class Meta:
         model = Book
+        fields = "__all__"
+
+class AuthorForm(ModelForm):
+    class Meta:
+        model = Author
         fields = "__all__"
 
 class RegistrationForm(forms.Form):

@@ -3,11 +3,10 @@ from django.http import HttpResponse, Http404
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render
 from exercises.models import Book, Author, Classification, Publisher
-from exercises.forms import PublisherForm, BookForm, RegistrationForm, LoginForm
+from exercises.forms import PublisherForm, BookForm, AuthorForm, RegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.conf import settings
 
 
 # Create your views here.
@@ -164,7 +163,17 @@ def create_book(request):
             return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "create_obj.html", {"form": form, "obj": "Book"})
     
-    
+@user_passes_test(is_admin)
+def create_author(request):
+    form = AuthorForm()
+    if request.method == "POST":
+        form = AuthorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Author.objects.all()})
+    return render(request, "create_obj.html", {"form": form, "obj": "Author"})
+
+
 def update_publisher(request, pk=None):
     publisher = get_object_or_404(Publisher, pk=pk)
     form = PublisherForm(instance=publisher)
@@ -185,6 +194,16 @@ def update_book(request, pk=None):
             return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "update_obj.html", {"form": form, "obj": "Book"})
 
+def update_author(request, pk=None):
+    author = get_object_or_404(Author, pk=pk)
+    form = AuthorForm(instance=author)
+    if request.method == "POST":
+        form = AuthorForm(request.POST, instance=author)
+        if form.is_valid():
+            form.save()
+            return render(request, "crud_results.html", {"results": Author.objects.all()})
+    return render(request, "update_obj.html", {"form": form, "obj": "Author"})
+
 
 def delete_publisher(request, pk=None):
     publisher = get_object_or_404(Publisher, pk=pk)
@@ -199,6 +218,13 @@ def delete_book(request, pk=None):
         book.delete()
         return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "delete_obj.html", {"obj": "Book"})
+
+def delete_author(request, pk=None):
+    author = get_object_or_404(Author, pk=pk)
+    if request.method == "POST":
+        author.delete()
+        return render(request, "crud_results.html", {"results": Author.objects.all()})
+    return render(request, "delete_obj.html", {"obj": "Author"})
 
 
 

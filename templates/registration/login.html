@@ -12,11 +12,5 @@
     {{ form.as_p }}
     <input type="submit" value="Login">
 </form>
-{% if error == "invalid login" %}
-    <p style="color: red;">Invalid Login</p>
-{% endif %}
 
-{% if error == "disabled account" %}
-    <p style="color: red;">Disabled Account Error</p>
-{% endif %}
 {% endblock %}

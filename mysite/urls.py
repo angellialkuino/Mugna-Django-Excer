@@ -35,17 +35,22 @@ urlpatterns = [
     path("classification/", views.classification_list),
     path("classification/<int:classification_id>", views.classification_books, name="classification"),
 
-    path("search-author/", views.search_author),
-    path("search-publisher/", views.search_publisher),
+    path("search-author/", views.search_author, name="search-author"),
+    path("search-publisher/", views.search_publisher, name="search-publisher"),
 
-    path("create-publisher/", views.create_publisher),
-    path("create-book/", views.create_book),
+    path("create-publisher/", views.create_publisher, name="create-publisher"),
+    path("create-book/", views.create_book, name="create-book"),
+    path("create-author/", views.create_author, name="create-author"),
+
 
     path("update-publisher/<int:pk>/", views.update_publisher),
     path("update-book/<int:pk>/", views.update_book, name='update-book'),
+    path("update-author/<int:pk>/", views.update_author, name='update-author'),
 
     path("delete-publisher/<int:pk>/", views.delete_publisher),
     path("delete-book/<int:pk>/", views.delete_book),
+    path("delete-author/<int:pk>/", views.delete_author, name='delete-author'),
+
 
 
     # path("register/", views.register),
