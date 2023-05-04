@@ -74,20 +74,14 @@ class DetailViewTest(TestCase):
 
 
     def test_anonymous_cannot_acces_page(self):
-        response = self.client.get(reverse("book-details", args="1"))
+        response = self.client.get(reverse("book-details", args=[1]))
         self.assertRedirects(response, "/accounts/login/?next=/books/1")
 
     def test_authenticated_can_acces_page(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse("book-details", args="1"))
+        response = self.client.get(reverse("book-details", args=[1]))
         self.assertEqual(response.status_code, 200)
-        # book = [Book.objects.get(id=1)]
-        self.assertQuerysetEqual(
-            response.context["book"],
-            [r for r in Book.objects.get(id=1)]) #ywa nga error
-
-    # def test_book_details(self):
-    #     response = self.client.get(reverse("book-details"), args="1")
+        self.assertEqual(response.context["book"], Book.objects.get(id=1))
 
 
 class AddAuthorTest(TestCase):
@@ -99,11 +93,6 @@ class AddAuthorTest(TestCase):
     def test_anonymous_cannot_access_page(self):
         response = self.client.get(reverse("create-author"))
         self.assertRedirects(response, "/accounts/login/?next=/create-author/")
-
-    # def test__authenticated_can_acces_page(self):
-    #     self.client.force_login(self.user)
-    #     response = self.client.post(reverse("create_author"))
-    #     self.assertEqual(response.status_code, 200)
 
     def test_add_author(self):
         self.client.force_login(self.user)
@@ -127,7 +116,7 @@ class AddAuthorTest(TestCase):
             "last_name": "Cat",
             "email": "ncat@gmail.com"
         }
-        response = self.client.post(reverse("update-author", args="1"), data=data)
+        response = self.client.post(reverse("update-author", args=[1]), data=data)
         self.assertTemplateUsed(response, "crud_results.html")
         self.assertContains(response,"Makko")
         self.assertEqual(Author.objects.count(), 1)
@@ -135,7 +124,7 @@ class AddAuthorTest(TestCase):
 
     def test_delete_author(self):
         self.client.force_login(self.user)
-        response = self.client.post(reverse("delete-author", args="1"))
+        response = self.client.post(reverse("delete-author", args=[1]))
         self.assertTemplateUsed(response, "crud_results.html")
         self.assertNotContains(response,"Jasonderulo")
         self.assertEqual(Author.objects.count(), 0)
