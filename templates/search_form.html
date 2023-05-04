@@ -12,5 +12,13 @@
       <input type="text" name="query">
       <input type="submit" value="Search">
     </form>  
+
+    <ul>
+      {% for a in results%}
+      <li>{{ a }}</a></li>
+      {% empty %}
+      <li>No Results</li>
+      {% endfor %}
+    </ul> 
 </body>
 </html>

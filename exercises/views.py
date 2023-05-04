@@ -1,3 +1,6 @@
+from typing import Any, Optional
+from django.db import models
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from datetime import datetime
@@ -7,6 +10,7 @@ from exercises.forms import PublisherForm, BookForm, AuthorForm, RegistrationFor
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 
 # Create your views here.
@@ -24,89 +28,79 @@ def mathed2(request, num1, num2):
     return render(
         request,
         "math.html",
-        {"sum": num1+num2, "diff": num1-num2, "prod": num1*num2, "quo": num1/num2}
+        {
+            "sum": num1 + num2,
+            "diff": num1 - num2,
+            "prod": num1 * num2,
+            "quo": num1 / num2,
+        },
     )
+
 
 def mathed3(request, num1, num2, num3):
     try:
         num1 = int(num1)
         num2 = int(num2)
         num3 = int(num3)
-        if num2 == 0 or num3 ==0:
+        if num2 == 0 or num3 == 0:
             raise Http404()
     except ValueError:
         raise Http404()
     return render(
         request,
         "math.html",
-        {"sum": num1+num2+num3, "diff": num1-num2-num3, "prod": num1*num2*num3, "quo": (num1/num2)/num3}
+        {
+            "sum": num1 + num2 + num3,
+            "diff": num1 - num2 - num3,
+            "prod": num1 * num2 * num3,
+            "quo": (num1 / num2) / num3,
+        },
     )
+
 
 def date_format(request, year, month, day):
     try:
         year = int(year)
         month = int(month)
         day = int(day)
-        datetime(year,month,day)        
+        datetime(year, month, day)
     except ValueError:
-        return render(
-        request,
-        "date_format.html",
-        {"status": "Invalid"}
-        )
+        return render(request, "date_format.html", {"status": "Invalid"})
 
-    return render(
-        request,
-        "date_format.html",
-        {"status": "Valid"}
-    )
+    return render(request, "date_format.html", {"status": "Valid"})
 
 
 @login_required
-def book_list(request):    
+def book_list(request):
     books = Book.objects.all()
-    return render(
-        request,
-        "book.html",
-        {"book_list": books}
-    )
+    return render(request, "book.html", {"book_list": books})
+
 
 @login_required
 def book_details(request, book_id):
-    book = Book.objects.get(id = int(book_id))
-    return render(
-        request,
-        'book_details.html',
-        {"book": book}
-    )
+    book = Book.objects.get(id=int(book_id))
+    return render(request, "book_details.html", {"book": book})
+
 
 @login_required
 def author_info(request, author_id):
-    author = Author.objects.get(id = int(author_id))
-    books = Book.objects.filter(author_id = int(author_id))
-    return render(
-        request,
-        'author_info.html',
-        {"author": author, "books": books}
-    )
+    author = Author.objects.get(id=int(author_id))
+    books = Book.objects.filter(author_id=int(author_id))
+    return render(request, "author_info.html", {"author": author, "books": books})
+
 
 @login_required
 def classification_list(request):
     classifications = Classification.objects.all()
     return render(
-        request,
-        'classification_list.html',
-        {"classifications": classifications}
+        request, "classification_list.html", {"classifications": classifications}
     )
+
 
 @login_required
 def classification_books(request, classification_id):
-    books = Book.objects.filter(classification_id = int(classification_id))
-    return render(
-        request,
-        'classification_books.html',
-        {"books": books}
-    )
+    books = Book.objects.filter(classification_id=int(classification_id))
+    return render(request, "classification_books.html", {"books": books})
 
 
 def search_author(request):
@@ -124,6 +118,7 @@ def search_author(request):
             )
     return render(request, "search_form.html", {"error": error})
 
+
 def search_publisher(request):
     error = False
     if "query" in request.GET:
@@ -140,8 +135,53 @@ def search_publisher(request):
     return render(request, "search_form.html", {"error": error})
 
 
+class SearchAuthor(ListView):
+    template_name = "search_form.html"
+    context_object_name = "results"
+
+    def get_queryset(self):
+        query = self.request.GET.get("query")
+        if query:
+            return Author.objects.filter(first_name__icontains=query)
+
+
+class SearchPublisher(ListView):
+    template_name = "search_form.html"
+    context_object_name = "results"
+
+    def get_queryset(self):
+        query = self.request.GET.get("query")
+        if query:
+            return Publisher.objects.filter(name__icontains=query)
+
+
+class BookCreate(CreateView):
+    template_name = "create_obj.html"
+    form_class = BookForm
+    success_url = "/books/"
+    model = Book
+
+
+class BookUpdate(UpdateView):
+    template_name = "create_obj.html"
+    form_class = BookForm
+    success_url = "/books/"
+    model = Book
+    # context_object_name = "book_list"
+
+    def get_object(self):
+        return get_object_or_404(Book, pk=self.kwargs.get("pk"))
+
+
+class BookDelete(DeleteView):
+    template_name = "delete_obj.html"
+    success_url = "/books/"
+    model = Book
+
+
 def is_admin(user):
     return user.is_superuser
+
 
 @user_passes_test(is_admin)
 def create_publisher(request):
@@ -150,8 +190,11 @@ def create_publisher(request):
         form = PublisherForm(request.POST)
         if form.is_valid():
             form.save()
-            return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+            return render(
+                request, "crud_results.html", {"results": Publisher.objects.all()}
+            )
     return render(request, "create_obj.html", {"form": form, "obj": "Publisher"})
+
 
 @user_passes_test(is_admin)
 def create_book(request):
@@ -162,7 +205,8 @@ def create_book(request):
             form.save()
             return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "create_obj.html", {"form": form, "obj": "Book"})
-    
+
+
 @user_passes_test(is_admin)
 def create_author(request):
     form = AuthorForm()
@@ -170,7 +214,9 @@ def create_author(request):
         form = AuthorForm(request.POST)
         if form.is_valid():
             form.save()
-            return render(request, "crud_results.html", {"results": Author.objects.all()})
+            return render(
+                request, "crud_results.html", {"results": Author.objects.all()}
+            )
     return render(request, "create_obj.html", {"form": form, "obj": "Author"})
 
 
@@ -181,8 +227,11 @@ def update_publisher(request, pk=None):
         form = PublisherForm(request.POST, instance=publisher)
         if form.is_valid():
             form.save()
-            return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+            return render(
+                request, "crud_results.html", {"results": Publisher.objects.all()}
+            )
     return render(request, "update_obj.html", {"form": form, "obj": "Publisher"})
+
 
 def update_book(request, pk=None):
     book = get_object_or_404(Book, pk=pk)
@@ -194,6 +243,7 @@ def update_book(request, pk=None):
             return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "update_obj.html", {"form": form, "obj": "Book"})
 
+
 def update_author(request, pk=None):
     author = get_object_or_404(Author, pk=pk)
     form = AuthorForm(instance=author)
@@ -201,7 +251,9 @@ def update_author(request, pk=None):
         form = AuthorForm(request.POST, instance=author)
         if form.is_valid():
             form.save()
-            return render(request, "crud_results.html", {"results": Author.objects.all()})
+            return render(
+                request, "crud_results.html", {"results": Author.objects.all()}
+            )
     return render(request, "update_obj.html", {"form": form, "obj": "Author"})
 
 
@@ -209,8 +261,11 @@ def delete_publisher(request, pk=None):
     publisher = get_object_or_404(Publisher, pk=pk)
     if request.method == "POST":
         publisher.delete()
-        return render(request, "crud_results.html", {"results": Publisher.objects.all()})
+        return render(
+            request, "crud_results.html", {"results": Publisher.objects.all()}
+        )
     return render(request, "delete_obj.html", {"obj": "Publisher"})
+
 
 def delete_book(request, pk=None):
     book = get_object_or_404(Book, pk=pk)
@@ -218,6 +273,7 @@ def delete_book(request, pk=None):
         book.delete()
         return render(request, "crud_results.html", {"results": Book.objects.all()})
     return render(request, "delete_obj.html", {"obj": "Book"})
+
 
 def delete_author(request, pk=None):
     author = get_object_or_404(Author, pk=pk)
@@ -227,7 +283,6 @@ def delete_author(request, pk=None):
     return render(request, "delete_obj.html", {"obj": "Author"})
 
 
-
 def register(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
@@ -235,13 +290,14 @@ def register(request):
             username = form.cleaned_data["username"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
-            user = User.objects.create_user(username,email,password)
+            user = User.objects.create_user(username, email, password)
 
             return render(request, "home.html")
     else:
-        form = RegistrationForm() #unbound form wtf is that
-    
+        form = RegistrationForm()  # unbound form wtf is that
+
     return render(request, "register.html", {"form": form})
+
 
 # def login_view(request):
 #     if request.method == "POST":
@@ -259,15 +315,12 @@ def register(request):
 #             else:
 #                 return render(request, "login.html", {"form": form, "error": "invalid login"})
 #     else:
-#         form = LoginForm() 
+#         form = LoginForm()
 #     return render(request, "login.html", {"form": form})
 
-# def logout_view(request):    
+# def logout_view(request):
 #     if "query" in request.GET:
 #         logout(request)
 #         form = LoginForm()
 #         return render(request, "login.html", {"form": form})
 #     return render(request, "logout.html")
-
-
-
