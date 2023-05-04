@@ -142,7 +142,24 @@ class SearchAuthor(ListView):
     def get_queryset(self):
         query = self.request.GET.get("query")
         if query:
+            if not self.request.session.get("search_history"):
+                print(query)
+                self.request.session["search_history"] = [query]
+            else:
+                print(query)
+                self.request.session["search_history"] = self.request.session[
+                    "search_history"
+                ] + [query]
             return Author.objects.filter(first_name__icontains=query)
+
+
+class SearchHistory(ListView):
+    template_name = "search_history.html"
+    context_object_name = "history"
+
+    def get_queryset(self):
+        if self.request.session.get("search_history"):
+            return self.request.session["search_history"]
 
 
 class SearchPublisher(ListView):

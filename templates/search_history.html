@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block header %}
+<h1>Exercise 10: Search History</h1>
+{% endblock %} 
+
+{% block content %} 
+<li>
+    {% for h in history%}
+    <ul><a href={% url "search-author" %}?query={{h}}>{{ h }}</a></ul>
+    {% comment %} <ul>{{ h }}</ul> {% endcomment %}
+
+    {% empty %}
+    <ul>No Results</ul>
+    {% endfor %}
+</li> 
+{% endblock %}

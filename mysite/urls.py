@@ -41,6 +41,7 @@ urlpatterns = [
     # path("search-publisher/", views.search_publisher, name="search-publisher"),
     path("search-author/", views.SearchAuthor.as_view(), name="search-author"),
     path("search-publisher/", views.SearchPublisher.as_view(), name="search-publisher"),
+    path("search-history/", views.SearchHistory.as_view(), name="search-history"),
     path("create-publisher/", views.create_publisher, name="create-publisher"),
     # path("create-book/", views.create_book, name="create-book"),
     path("create-book/", views.BookCreate.as_view(), name="create-book"),
