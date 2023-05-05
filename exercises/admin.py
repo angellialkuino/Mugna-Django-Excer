@@ -8,26 +8,37 @@ from exercises.models import Book, Author, Classification, Publisher
 #     model = Book
 #     extra = 3
 
+
 class BookAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {"fields": ["title","author","publisher", "classification"]},),
+        (
+            None,
+            {"fields": ["title", "author", "publisher", "classification"]},
+        ),
     ]
-    list_display = ["title","author","publisher"]
+    list_display = ["title", "author", "publisher"]
+
 
 class AuthorAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {"fields": ["first_name", "last_name"]},),
-        ("e-mail", {"fields": ["email"]},),
+        (
+            None,
+            {"fields": ["first_name", "last_name", "user"]},
+        ),
+        (
+            "e-mail",
+            {"fields": ["email"]},
+        ),
     ]
     list_display = ["first_name", "last_name", "email"]
     search_fields = ["first_name", "last_name"]
 
+
 class PublisherAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {"fields": ["name", "city", "country", "website"]})
-    ]
+    fieldsets = [(None, {"fields": ["name", "city", "country", "website"]})]
     list_display = ["name", "city", "country", "website"]
     search_fields = ["name", "city", "country", "website"]
+
 
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author, AuthorAdmin)
